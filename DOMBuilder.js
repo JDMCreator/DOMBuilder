@@ -1,4 +1,4 @@
-function (window, undefined) {
+(function (window, undefined) {
     var document = window.document,
         regexp_tagname = /^[a-z]+/i,
         regexp_arguments = /([.]{1}[^\[#.]+)|(#{1}[^\[#.]+)|(\[[ ]*[a-z_-]+[ ]*\])|(\[[ ]*[a-z_-]+[ ]*=[^\]]+\])/gi,
@@ -12,7 +12,7 @@ function (window, undefined) {
                 "chOff", "vAlign", "colSpan", "noWrap", "rowSpan", "frameBorder", "longDesc", "marginHeight",
                 "marginWidth", "noResize"
         ],
-        wrong_attributes_list = "|" + wrong_attributes.join("|") + "|";
+        wrong_attributes_list = "|" + wrong_attributes.join("|") + "|",
 
     trimPrototype = String.prototype.trim,
     trim = function trim(str) {
