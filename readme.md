@@ -21,12 +21,12 @@ element.checked = "checked";
 ```
 
 
-with options :
+When you create an HTML node, the optional second argument is an options ``object`` :
 
 ```js
 DOMBuilder("input#id.myClass[type=checkbox][checked]", {
     on : {
-		click : function(){
+    	click : function(){
 				this.style.background = "red";
 			}
 	     }
@@ -35,12 +35,12 @@ DOMBuilder("input#id.myClass[type=checkbox][checked]", {
 
 DOMBuilder aims to support IE6+, FF3+, Safari 3+, Chrome 2+ and Opera 9+. If some features don't work, it's a bug.
 
-Create a comment :
+How to create a comment :
 ```js
 DOMBuilder("<!--comment-->");
 ```
 
-Create a Text Node :
+How to create a Text Node :
 
 ```js
 DOMBuilder('"my text"');
@@ -48,7 +48,15 @@ DOMBuilder('"my text"');
 
 *You don't need to escape the quotes marks.*
 
-When you create an HTML element, you can use the optional second argument, which is an option object.
+How to create an HTML node :
+
+```js
+DOMBuilder("input#ID.class[type=checkbox][checked]");
+```
+
+The first argument is a CSS selector.
+
+If your second attribute is ```String```, this string will be the value of the **content** attribute.
 
 List of properties of the optional object
 ----------------------------------------
@@ -68,17 +76,22 @@ DOMBuilder("label", {
 
 *If you don't want to quote the attributes' name, you must use __className__ for the CLASS attribute and __htmlFor__ for the FOR attribute*
 
-**childNodes** : An ```Array``` of the child nodes of the element. The elements of the array can be an ```HTMLElement Object``` or a ```String```. If it's a String, the ```DOMBuilder``` function will be called and the String will be the first argument. Example :
+**childNodes** : An ```Array``` of the child nodes of the element. The elements of the array can be an ```HTMLElement Object```, an ```Array``` or a ```String```. If it's a String, the ```DOMBuilder``` function will be called and the String will be the first argument. If it's an Array, it will be the arguments of the ```DOMBuilder``` function.Example :
 
 ```js
 DOMBuilder("div#myDiv", {
-        childNodes : [
-            document.createElement("span"),
+    childNodes: [
+        document.createElement("span"),
             "<!--a comment-->", // This will create a comment
-            "'Commedia dell'arte'", // This will create a Text Node (DON'T ESCAPE THE APOSTROPHE)
-            "img[src=myimage.jpeg]", // This will create an image
-            DOMBuilder("img[src=myimage.jpeg]") // This is the same
-        ]
+        "'Commedia dell'arte'", // This will create a Text Node (DON'T ESCAPE THE APOSTROPHE)
+        "img[src=myimage.jpeg]", // This will create an image
+        ["img", {
+                attr: {
+                    src: "myimage.jpeg"
+                }
+            }
+        ] // This is the same
+    ]
 });
 ```
 
@@ -88,19 +101,19 @@ The HTML code of the element that is generated should look like this :
 <div id="myDiv"><span></span><!--a comment-->Commedia dell'arte<img src="myimage.jpeg"><img src="myimage.jpeg"></div>
 ```
 
-**css** : For all element, except STYLE, see **style**. For STYLE HTML elements, the content of the element.
+**content** : ```String```. Same as **value** for &lt;INPUT> and &lt;TEXTAREA>, **script** for &lt;SCRIPT>, **css** for &lt;STYLE> and **html** for other HTML tags.
 
-**cssText** : See **style**.
+**css** : ```String```. For all element, except STYLE, see **style**. For STYLE HTML elements, the content of the element.
 
-**documentFragment** : Embed the element in a document fragment
+**cssText** : ```String```. See **style**.
 
-**fragment** : See **documentFragment**
+**documentFragment** : ```Boolean```. Embed the element in a document fragment
 
-**innerHTML** : The innerHTML of the element. Works for all element (including SCRIPT and STYLE) excepts for singleton tag (BR, HR, INPUT, META, ...) and TEXTAREA.
+**fragment** : ```Boolean```. See **documentFragment**
 
-**innerText** : The text of the Text Node that will be the only child node of the element
+**html** : ```String```. The innerHTML of the element. Works for all element excepts singleton tags (BR, HR, META, ...), SCRIPT (use **script** or **content**), STYLE (use **css** or **content**), INPUT and TEXTAREA (use **value**).
 
-**jQuery** : The jQuery function. If specified, we'll use the ".on()" jQuery function to append the events. Example :
+**jQuery** : ```Function``` or ```Boolean```. The jQuery function. If specified, we'll use the ".on()" jQuery function to append the events. Example :
 
 ```js
 DOMBuilder("label", {
@@ -108,7 +121,7 @@ DOMBuilder("label", {
 });
 ```
 
-**on** : Object of events listeners. Example :
+**on** : ```Object``` of events listeners. Example :
 
 ```js
 DOMBuilder("div", {
@@ -123,7 +136,7 @@ DOMBuilder("div", {
 });
 ```
 
-**style** : STYLE attribute of the element. Example :
+**style** : ```String```. STYLE attribute of the element. Example :
 
 ```js
 DOMBuilder("div", {
@@ -131,3 +144,21 @@ DOMBuilder("div", {
 });
 ```
 
+**tableBeautifier** : ```Boolean```. The table beautifier is a functionnality that automatically add TBODY, TR, TD tags in your tables when you have to insert them. You can turn it off with a ``Boolean`` value or ``0``.
+
+```js
+DOMBuilder("table", {
+    childNodes : ["tbody"],
+    tableBeautifier : false
+})
+```
+
+**text** : ```String```. The text of the Text Node that will be the only child node of the element
+
+```js
+DOMBuilder("div", {
+    text : "<text>"
+})
+```
+
+**value** : ```String```. The value of the ``defaultValue`` property of INPUT and TEXTAREA elements.

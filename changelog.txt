@@ -1,0 +1,50 @@
+|=================================|
+|======== DOMBuilder.js ==========|
+|=================================|
+|======= (c) JDMCreator ==========|
+|=================================|
+|============= 2013 ==============|
+|=================================|
+
+
+Description : DOMBuilder.js is a crossbrowser solution to create DOM elements, like HTML nodes, text nodes and comment nodes. It tries to patch every bugs in IE6+, FF3+, Safari 3+, Chrome 1+ and Opera 8+
+
+Legend :
+
++ Added
+/ Change
+- Removed
+# Fixed
+
+=================================
+========== Version 1.1 ==========
+=================================
+
+
+Release date : April 29th, 2013
+
++ added "script" property for SCRIPT tag
++ added "content" property for all tags (same as "html", "script", "css" and "value" property)
++ added "value" property for both INPUT and TEXTAREA tag
++ added a table beautifier, which auto-create elements (TBODY, TR, TD) inside a TABLE tag when they are not specified
++ added a "tableBeautifier" property which disable the table beautifier when you set it to ``false`` or ``0``.
+
+/ "innerHTML" property's name is now "html"
+/ "innerText" property's name is now "text"
+/ Changed the way DOMBuilder handle the innerText/text property. innerText and textContent are not used anymore.
+
+# Fixed : setting accesskey didn't work in Firefox 3
+# Fixed : setting content of a STYLE element didn't work in IE6. I found a nice workaround :)
+# Fixed : It was impossible to add a TR before a TBODY in TABLE elements in IE 6-7
+# Fixed : In IE 6-7, in some situations, setting a "name" attribute to an INPUT didn't work
+# Fixed : In IE, it was impossible to set the text of <HTML> elements
+# Fixed : In IE, it was impossible to set the html of <TABLE> tags
+# Fixed : In IE, it was impossible to set the html of <TR> tags
+
+
+
+=================================
+========== Version 1.0 ==========
+=================================
+
++ Initial release

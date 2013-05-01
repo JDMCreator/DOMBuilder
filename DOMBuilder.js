@@ -1,10 +1,12 @@
+/* (c) 2013, JDMCreator | DOMBuilder.js | Version 1.1 */
 (function (window, undefined) {
     var document = window.document,
         regexp_tagname = /^[a-z]+/i,
         regexp_arguments = /([.]{1}[^\[#.]+)|(#{1}[^\[#.]+)|(\[[ ]*[a-z_-]+[ ]*\])|(\[[ ]*[a-z_-]+[ ]*=[^\]]+\])/gi,
+        regexp_argument_name = /\[\s*name\s*=([^\]]+)\]/gi,
         regexp_attributes_empty = /^\[[ ]?([\s\S]*)[ ]?\]$/i,
         regexp_attributes = /\[[ ]*([a-z_-]+)[ ]*=[ ]*([^\]]+)/gi,
-        regexp_comment = /^<--([\S\s]*)-->$/gi,
+        regexp_comment = /^<!--([\S\s]*)-->$/gi,
 
         /* Attributes that need to be escaped for IE6 */
         wrong_attributes = ["httpEquiv", "aLink", "bgColor", "vLink", "acceptCharset", "tabIndex", "accessKey", "readOnly",
@@ -12,66 +14,102 @@
                 "chOff", "vAlign", "colSpan", "noWrap", "rowSpan", "frameBorder", "longDesc", "marginHeight",
                 "marginWidth", "noResize"
         ],
-        wrong_attributes_list = "|" + wrong_attributes.join("|") + "|",
+        wrong_attributes_list = "|" + wrong_attributes.join("|").toLowerCase() + "|",
 
-    trimPrototype = String.prototype.trim,
-    trim = function trim(str) {
-        if (trimPrototype) {
-            trimPrototype.call(str);
+        trimPrototype = String.prototype.trim,
+        trim = function trim(str) {
+            if (trimPrototype) {
+                trimPrototype.call(str);
+            }
+            var str = str.replace(/^\s\s*/, ''),
+                ws = /\s/,
+                i = str.length;
+            while (ws.test(str.charAt(--i)));
+            return str.slice(0, i + 1);
+        },
+        camelize = function (str) {
+            return str.replace(/(\-[a-z])/g, function ($1) {
+                return $1.toUpperCase().replace('-', '');
+            });
+        },
+        isArray = function (a) {
+            return Object.prototype.toString.call(a) === "[object Array]";
         }
-        var str = str.replace(/^\s\s*/, ''),
-            ws = /\s/,
-            i = str.length;
-        while (ws.test(str.charAt(--i)));
-        return str.slice(0, i + 1);
-    },
-    camelize = function (str) {
-        return str.replace(/(\-[a-z])/g, function ($1) {
-            return $1.toUpperCase().replace('-', '');
-        });
-    },
     isASingleton = function isASingleton(tag) {
         return "|base|br|col|command|embed|hr|img|input|link|meta|param|source".indexOf("|" + tag + "|") != -1;
     },
-    xCreateElement = function xCreateElement(selector, element, options) {
+    xCreateElement = function xCreateElement(selector, element, options, fixIEBug) {
         if (element.nodeType != 1) {
             return element;
         }
         var style = element.style,
             tagname = element.tagName.toLowerCase();
-        if (tagname == "style" && (options.innerHTML || options.innerText || options.css)) {
-            var css = options.css || options.innerText || options.innerHTML;
+        if (tagname == "style" && (options.content || options.text || options.css)) {
+            var css = options.css || options.content || options.text;
             if (element.styleSheet) {
                 element.styleSheet.cssText = css;
             }
             else {
-                element.appendChild(document.createTextNode(css));
+                var copyStyle = element.cloneNode(true),
+                    op = document.createElement("head");
+                op.appendChild(copyStyle);
+                if (copyStyle.styleSheet) {
+                    copyStyle.styleSheet.cssText = css;
+                    element = copyStyle.parentNode.removeChild(copyStyle);
+                }
+                else {
+                    element.appendChild(document.createTextNode(css));
+                }
             }
+
         }
-        else if (tagname == "script" && (options.innerHTML || options.innerText)) {
-            element.text = options.innerText || options.innerHTML;
+        else if (tagname == "script" && (options.script || options.content || options.text)) {
+            element.text = options.script || options.content || options.text;
         }
-        else {
-            if (options.innerHTML && !isASingleton(tagname)) {
+        else if ((options.html || options.content) && !isASingleton(tagname)) {
+            try {
+                if (tagname == "tr" && element.outerHTML) {
+                    // Fix a terrible bug where .innerHTML doesn't work for <TR> elements, but no error is throwed
+                    var containerElement = document.createElement("div");
+                    containerElement.innerHTML = "<table><tbody><tr>" + (options.html || options.content) + "</tr></tbody></table>";
+                    containerElement = containerElement.getElementsByTagName("tr")[0];
+                    while (containerElement.firstChild) {
+                        element.appendChild(containerElement.firstChild);
+                    }
+                }
+                else {
+                    element.innerHTML = options.html || options.content;
+                }
+            }
+            catch (e) {
                 try {
-                    element.innerHTML = options.innerHTML
+                    // Fix a terrible IE bug where .innerHTML is read-only for some elements
+                    var containerElement = document.createElement("div");
+                    containerElement.innerHTML = options.html || options.content;
+                    while (containerElement.firstChild) {
+                        element.appendChild(containerElement.firstChild);
+                    }
+
                 }
                 catch (e) {}
             }
-            if (options.innerText && !isASingleton(tagname)) {
-                var innerText = options.innerText;
-                try {
-                    element.innerText = innerText;
-                    element.textContent = innerText;
-                    style.content = innerText
-                }
-                catch (e) {}
+        }
+        else if (options.text && !isASingleton(tagname)) {
+            try {
+                element.appendChild(document.createTextNode(options.text));
             }
+            catch (e) {}
+        }
+        else if (options.content && (tagname == "input" || tagname == "textarea")) {
+            options.value = options.value || content;
         }
         if (options.style || options.cssText || (options.css && tagname != "style")) {
             var css = options.style || options.cssText || options.css;
             element.setAttribute("style", css);
             style.cssText = css;
+        }
+        if (options.value && (tagname == "input" || tagname == "textarea")) {
+            element.defaultValue = value;
         }
         if (options.on) {
             var on = options.on,
@@ -102,17 +140,51 @@
                 hasOwnProperty = attr.hasOwnProperty;
             for (var i in attr) {
                 if ((hasOwnProperty && hasOwnProperty.call(attr, i)) || proto[i] !== attr[i]) {
-                    setAttribute(element, i, attr[i]);
+                    if (!fixIEBug && (tagname != "input" || i.toLowerCase() != "name")) {
+                        setAttribute(element, i, attr[i]);
+                    }
                 }
             }
         }
         if (options.childNodes) {
-            for (var c = options.childNodes, i = 0, l = c.length, child; i < l; i++) {
+            var c = options.childNodes;
+            for (var c = isArray(c) ? c : [c], i = 0, l = c.length, child; i < l; i++) {
                 child = c[i];
-                if (child.toString() === child) {
+                if (isArray(child)) {
+                    child = DOMBuilder(child[0], child[1]);
+                }
+                else if (child.toString() === child) {
                     child = DOMBuilder(child);
                 }
-                element.appendChild(child);
+                if (tagname == "table" && options.tableBeautifier !== false && options.tableBeautifier !== 0) {
+                    var tbody = element.firstChild,
+                        childTN = child.tagName;
+                    if (!tbody || "|TBODY|THEAD|TFOOT|".indexOf("|" + tbody.tagName + "|") == -1) {
+                        tbody = element.appendChild(document.createElement("tbody"));
+                    }
+                    if (childTN == "tr") {
+                        tbody.appendChild(child);
+                    }
+                    else {
+                        var tr = tbody.firstChild;
+                        if (!tr || tr.tagname != "TR") {
+                            tr = tbody.appendChild(document.createElement("tr"));
+                        }
+                        if (childTN == "td" || childTN == "th") {
+                            tr.appendChild(child);
+                        }
+                        else {
+                            var td = tr.firstChild;
+                            if (!td || td.tagName != "TD" || td.tagName != "TH") {
+                                td = tr.appendChild(document.createElement("td"));
+                            }
+                            td.appendChild(child);
+                        }
+                    }
+                }
+                else {
+                    element.appendChild(child);
+                }
             }
         }
         if (options.documentFragment || options.fragment) {
@@ -134,42 +206,43 @@
         }
         else if ("|style|class|classname|type|for|htmlfor|".indexOf("|" + name + "|") != -1) {
             switch (name) {
-                case "style":
-                    element.setAttribute(name, value);
-                    element.style.cssText = value;
-                    break;
-                case "class":
-                case "classname":
-                    if (element.classList) {
-                        var classname = value.split(/\s+/g);
-                        for (var i = 0; i < classname.length; i++) {
-                            element.classList.add(classname[i]);
-                        }
+            case "style":
+                element.setAttribute(name, value);
+                element.style.cssText = value;
+                break;
+            case "class":
+            case "classname":
+                if (element.classList) {
+                    var classname = value.split(/\s+/g);
+                    for (var i = 0; i < classname.length; i++) {
+                        element.classList.add(classname[i]);
                     }
-                    else {
-                        element.className = value;
-                    }
-                case "type":
-                    element.type = value;
-                    break;
-                case "for":
-                case "htmlfor":
-                    element.htmlFor = value;
-                    break;
-                default:
-                    element.setAttribute(name, value, 0);
+                }
+                else {
+                    element.className = value;
+                }
+            case "type":
+                element.type = value;
+                break;
+            case "for":
+            case "htmlfor":
+                element.htmlFor = value;
+                break;
+            default:
+                element.setAttribute(name, value, 0);
             }
         }
         else if (wrong_attributes_list.indexOf("|" + name + "|") != -1) {
             for (var i = 0, n, ni; i < wrong_attributes.length; i++) {
-                n = wrong_attributes[i],
-                ni = n.toLowerCase();
+                var n = wrong_attributes[i],
+                    ni = n.toLowerCase();
                 if (ni == name) {
                     element[n] = value;
                 }
             }
         }
         else {
+
             element.setAttribute(name, value, 0);
         }
     },
@@ -179,6 +252,7 @@
         if (!selector) {
             return null
         }
+        regexp_comment.lastIndex = 0;
         var comment = regexp_comment.exec(selector),
             selector_first_char = selector.charAt(0);
         if (comment && comment[1]) {
@@ -193,7 +267,43 @@
         else {
             /* Process HTML Elements */
             var tagname = regexp_tagname.exec(selector) || "div",
-                element = document.createElement(tagname[0]);
+                element = document.createElement(tagname[0]),
+                fixIEBug = false;
+            if (tagname.toString().toLowerCase() == "input") {
+                var name = (options && options.attr) ? options.attr["name"] || options.attr["NAME"] : false,
+                    name_first_char;
+                if (!name) {
+                    regexp_argument_name.lastIndex = 0;
+                    while (match = regexp_argument_name.exec(selector)) {
+                        name = match[1];
+                    };
+                    if (name) {
+                        name = trim(name);
+                        name_first_char = name.charAt(0);
+                        if ((name_first_char == "'" || name_first_char == '"') && name.charAt(name.length - 1) == name_first_char) {
+                            name = name.substring(1, name.length - 1);
+                        }
+                    }
+                }
+                if (name) {
+                    // Terrible try{} catch{} for IE6-7 bug where "name" attribute for input don't work
+                    // more info here : http://webbugtrack.blogspot.ca/2007/10/bug-235-createelement-is-broken-in-ie.html
+                    // I'll try to find another way to patch this issue;
+                    try {
+                        element = document.createElement('<input name = "' + name + '" >');
+                        fixIEBug = true;
+                    }
+                    catch (e) {
+                        element = document.createElement('input');
+                        element.name = name;
+                    }
+                    if (element.tagName != "INPUT") {
+                        // Another validation in case a future browser is stupid enough to run the first code
+                        element = document.createElement('input');
+                        element.name = name;
+                    }
+                }
+            }
             while (match = regexp_arguments.exec(selector)) {
                 if (match[1]) {
                     var classname = match[1].substring(1);
@@ -227,17 +337,19 @@
                     if ((attribute_value_first_char == "'" || attribute_value_first_char == '"') && attribute_value_first_char === attribute_value_last_char) {
                         attribute_value = attribute_value.substring(1, attribute_value.length - 1)
                     }
-                    setAttribute(element, attribute_name, attribute_value);
+                    if (!fixIEBug && (attribute_name.toLowerCase() != "name" || element.tagName != "INPUT")) {
+                        setAttribute(element, attribute_name, attribute_value);
+                    }
                 }
             }
         }
         if (options && options.toString() === options) {
             options = {
-                innerHTML: options
+                content: options
             }
         }
         if (options && xCreateElement) {
-            element = xCreateElement(selector, element, options)
+            element = xCreateElement(selector, element, options, fixIEBug)
         }
         return element
     }
