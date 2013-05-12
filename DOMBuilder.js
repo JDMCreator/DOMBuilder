@@ -1,4 +1,4 @@
-/* (c) 2013, JDMCreator | DOMBuilder.js | Version 1.1 */
+/* (c) 2013, JDMCreator | DOMBuilder.js | Version 1.1.2 */
 (function (window, undefined) {
     var document = window.document,
         regexp_tagname = /^[a-z]+/i,
@@ -9,7 +9,7 @@
         regexp_comment = /^<!--([\S\s]*)-->$/gi,
 
         /* Attributes that need to be escaped for IE6 */
-        wrong_attributes = ["httpEquiv", "aLink", "bgColor", "vLink", "acceptCharset", "tabIndex", "accessKey", "readOnly",
+        wrong_attributes = ["httpEquiv", "allowTransparency", "aLink", "bgColor", "vLink", "acceptCharset", "tabIndex", "accessKey", "readOnly",
                 "useMap", "dateTime", "isMap", "codeBase", "codeType", "noHref", "cellPadding", "cellSpacing",
                 "chOff", "vAlign", "colSpan", "noWrap", "rowSpan", "frameBorder", "longDesc", "marginHeight",
                 "marginWidth", "noResize"
@@ -27,12 +27,12 @@
             while (ws.test(str.charAt(--i)));
             return str.slice(0, i + 1);
         },
-        camelize = function (str) {
+        camelize = function camelize(str) {
             return str.replace(/(\-[a-z])/g, function ($1) {
                 return $1.toUpperCase().replace('-', '');
             });
         },
-        isArray = function (a) {
+        isArray = function isArray(a) {
             return Object.prototype.toString.call(a) === "[object Array]";
         }
     isASingleton = function isASingleton(tag) {
@@ -79,6 +79,10 @@
                 }
                 else {
                     element.innerHTML = options.html || options.content;
+                    if (tagname == "pre") {
+                        // Fix a bug in IE
+                        element.innerHTML = element.innerHTML;
+                    }
                 }
             }
             catch (e) {
@@ -101,14 +105,14 @@
             catch (e) {}
         }
         else if (options.content && (tagname == "input" || tagname == "textarea")) {
-            options.value = options.value || content;
+            options.defaultValue = options.value || content;
         }
         if (options.style || options.cssText || (options.css && tagname != "style")) {
             var css = options.style || options.cssText || options.css;
             element.setAttribute("style", css);
             style.cssText = css;
         }
-        if (options.value && (tagname == "input" || tagname == "textarea")) {
+        if (options.value && (tagname == "input" || tagname == "textarea" || tagname == "option")) {
             element.defaultValue = value;
         }
         if (options.on) {

@@ -17,6 +17,18 @@ Legend :
 # Fixed
 
 =================================
+========== Version 1.1.2 ==========
+=================================
+
+
+Release date : May 12th, 2013
+
+# Fixed : "content" attribute for <TEXTAREA> and <INPUT> tags now set the "defaultAttribute" attribute and not the "value" attribute
+# Fixed : "value" attribute is now supported for <OPTION> tags
+# Fixed : "allowTransparency" attribute is now supported in IE 6-7
+# Fixed : Setting whitespaces with the "html" or "content property of <PRE> didn't work 
+
+=================================
 ========== Version 1.1 ==========
 =================================
 

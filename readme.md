@@ -1,7 +1,7 @@
 DOMBuilder
 =============
 
-__Wait for more infos !__
+__Version 1.1.2__
 
 How to use :
 -------------
@@ -161,4 +161,4 @@ DOMBuilder("div", {
 })
 ```
 
-**value** : ```String```. The value of the ``defaultValue`` property of INPUT and TEXTAREA elements.
+**value** : ```String```. The value of the ``defaultValue`` property of INPUT, OPTION and TEXTAREA elements.
