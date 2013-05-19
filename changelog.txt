@@ -17,16 +17,29 @@ Legend :
 # Fixed
 
 =================================
-========== Version 1.1.2 ==========
+========== Version 1.2 ==========
+=================================
+
+
+Release date : May 18th, 2013
+
+# Fixed : "noShade", "hSpace" and "vSpace" attributes are now supported in IE 6-7
+# Fixed : Setting inline events didn't work in IE
+# Fixed : It was impossible to add comments, <TBODY>, <THEAD>, <TFOOT>, <COLGROUP> and <CAPTION> in a <TABLE> elements with the tableBeautifier on
+# Fixed : "value" didn't worked for <OPTION> tags
+
+
+=================================
+========== Version 1.1.2 ========
 =================================
 
 
 Release date : May 12th, 2013
 
-# Fixed : "content" attribute for <TEXTAREA> and <INPUT> tags now set the "defaultAttribute" attribute and not the "value" attribute
+# Fixed : "content" attribute for <TEXTAREA> and <INPUT> tags now set the "defaultValue" attribute and not the "value" attribute
 # Fixed : "value" attribute is now supported for <OPTION> tags
 # Fixed : "allowTransparency" attribute is now supported in IE 6-7
-# Fixed : Setting whitespaces with the "html" or "content property of <PRE> didn't work 
+# Fixed : Setting whitespaces with the "html" or "content" property of <PRE> didn't work 
 
 =================================
 ========== Version 1.1 ==========

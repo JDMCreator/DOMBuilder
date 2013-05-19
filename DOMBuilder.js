@@ -1,4 +1,4 @@
-/* (c) 2013, JDMCreator | DOMBuilder.js | Version 1.1.2 */
+/* (c) 2013, JDMCreator | DOMBuilder.js | Version 1.2 */
 (function (window, undefined) {
     var document = window.document,
         regexp_tagname = /^[a-z]+/i,
@@ -8,11 +8,11 @@
         regexp_attributes = /\[[ ]*([a-z_-]+)[ ]*=[ ]*([^\]]+)/gi,
         regexp_comment = /^<!--([\S\s]*)-->$/gi,
 
-        /* Attributes that need to be escaped for IE6 */
+        /* Attributes that need to be escaped for IE6-7 */
         wrong_attributes = ["httpEquiv", "allowTransparency", "aLink", "bgColor", "vLink", "acceptCharset", "tabIndex", "accessKey", "readOnly",
                 "useMap", "dateTime", "isMap", "codeBase", "codeType", "noHref", "cellPadding", "cellSpacing",
                 "chOff", "vAlign", "colSpan", "noWrap", "rowSpan", "frameBorder", "longDesc", "marginHeight",
-                "marginWidth", "noResize"
+                "marginWidth", "noResize", "noShade", "hSpace", "vSpace"
         ],
         wrong_attributes_list = "|" + wrong_attributes.join("|").toLowerCase() + "|",
 
@@ -80,7 +80,7 @@
                 else {
                     element.innerHTML = options.html || options.content;
                     if (tagname == "pre") {
-                        // Fix a bug in IE
+                        // Fix a bug in IE where whitespaces are removed
                         element.innerHTML = element.innerHTML;
                     }
                 }
@@ -112,8 +112,13 @@
             element.setAttribute("style", css);
             style.cssText = css;
         }
-        if (options.value && (tagname == "input" || tagname == "textarea" || tagname == "option")) {
-            element.defaultValue = value;
+        if (options.value) {
+            if (tagname == "input" || tagname == "textarea") {
+                element.defaultValue = options.value;
+            }
+            else if (tagname == "option") {
+                element.value = options.value;
+            }
         }
         if (options.on) {
             var on = options.on,
@@ -163,26 +168,34 @@
                 if (tagname == "table" && options.tableBeautifier !== false && options.tableBeautifier !== 0) {
                     var tbody = element.firstChild,
                         childTN = child.tagName;
-                    if (!tbody || "|TBODY|THEAD|TFOOT|".indexOf("|" + tbody.tagName + "|") == -1) {
-                        tbody = element.appendChild(document.createElement("tbody"));
+                    if ("|TBODY|THEAD|TFOOT|".indexOf("|" + childTN + "|") != -1 || child.nodeType == 8) {
+                        element.appendChild(child);
                     }
-                    if (childTN == "tr") {
-                        tbody.appendChild(child);
+                    else if (childTN == "COLGROUP" || childTN == "CAPTION") {
+                        element.insertBefore(child, tbody);
                     }
                     else {
-                        var tr = tbody.firstChild;
-                        if (!tr || tr.tagname != "TR") {
-                            tr = tbody.appendChild(document.createElement("tr"));
+                        if (!tbody || "|TBODY|THEAD|TFOOT|".indexOf("|" + tbody.tagName + "|") == -1) {
+                            tbody = element.appendChild(document.createElement("tbody"));
                         }
-                        if (childTN == "td" || childTN == "th") {
-                            tr.appendChild(child);
+                        if (childTN == "tr") {
+                            tbody.appendChild(child);
                         }
                         else {
-                            var td = tr.firstChild;
-                            if (!td || td.tagName != "TD" || td.tagName != "TH") {
-                                td = tr.appendChild(document.createElement("td"));
+                            var tr = tbody.firstChild;
+                            if (!tr || tr.tagname != "TR") {
+                                tr = tbody.appendChild(document.createElement("tr"));
                             }
-                            td.appendChild(child);
+                            if (childTN == "td" || childTN == "th") {
+                                tr.appendChild(child);
+                            }
+                            else {
+                                var td = tr.firstChild;
+                                if (!td || td.tagName != "TD" || td.tagName != "TH") {
+                                    td = tr.appendChild(document.createElement("td"));
+                                }
+                                td.appendChild(child);
+                            }
                         }
                     }
                 }
@@ -207,6 +220,14 @@
             else {
                 element.setAttribute(name, value);
             }
+        }
+        else if (/^on/.test(name)) {
+            element.setAttribute(name, value);
+            // Fix a bug where setting inline events in IE doesn't work
+            try {
+                element[name] = new Function(value);
+            }
+            catch (e) {}
         }
         else if ("|style|class|classname|type|for|htmlfor|".indexOf("|" + name + "|") != -1) {
             switch (name) {
@@ -262,6 +283,7 @@
         if (comment && comment[1]) {
             /* Process comments */
             var element = document.createComment("");
+            // Fix a rare bug in FF where the comment can't include "--"
             element.nodeValue = comment[1];
         }
         else if ((selector_first_char == '"' || selector_first_char == "'") && selector.charAt(selector.length - 1) == selector_first_char) {
