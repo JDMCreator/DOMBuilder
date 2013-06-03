@@ -13,14 +13,14 @@ for(u.innerHTML=n.html||n.content;u.firstChild;)r.appendChild(u.firstChild)}catc
 r.setAttribute("style",c),s.cssText=c}if(n.value&&("input"==l||"textarea"==l?r.defaultValue=n.value:"option"==l&&(r.value=n.value)),n.on){var h=n.on,m=h.constructor.prototype,g=h.hasOwnProperty
 for(var y in h)if(g&&g.call(h,y)||m[y]!==h[y])if(n.jQuery&&(typeof n.jQuery==typeof Function()||e.jQuery)){var v=n.jQuery=typeof n.jQuery==typeof Function()?n.jQuery:e.jQuery
 v.on(y,h[y])}else r.addEventListener?r.addEventListener(y,h[y],!1):r.attachEvent&&r.attachEvent("on"+event,function(e,t){return function(){e.call(t)}}(h[y],r))}if(n.attr){var C=n.attr,m=C.constructor.prototype,g=C.hasOwnProperty
-for(var y in C)(g&&g.call(C,y)||m[y]!==C[y])&&(i||"input"==l&&"name"==y.toLowerCase()||setAttribute(r,y,C[y]))}if(n.childNodes)for(var x,T=n.childNodes,T=p(T)?T:[T],y=0,b=T.length;b>y;y++)if(x=T[y],p(x)?x=DOMBuilder(x[0],x[1]):""+x===x&&(x=DOMBuilder(x)),"table"==l&&n.tableBeautifier!==!1&&0!==n.tableBeautifier){var A=r.firstChild,O=x.tagName
-if(-1!="|TBODY|THEAD|TFOOT|".indexOf("|"+O+"|")||8==x.nodeType)r.appendChild(x)
-else if("COLGROUP"==O||"CAPTION"==O)r.insertBefore(x,A)
-else if(A&&-1!="|TBODY|THEAD|TFOOT|".indexOf("|"+A.tagName+"|")||(A=r.appendChild(t.createElement("tbody"))),"tr"==O)A.appendChild(x)
+for(var y in C)(g&&g.call(C,y)||m[y]!==C[y])&&(i||"input"==l&&"name"==y.toLowerCase()||setAttribute(r,y,C[y]))}if(n.childNodes)for(var T,x=n.childNodes,x=p(x)?x:[x],y=0,b=x.length;b>y;y++)if(T=x[y],p(T)?T=DOMBuilder(T[0],T[1]):""+T===T&&(T=DOMBuilder(T)),"table"==l&&n.tableBeautifier!==!1&&0!==n.tableBeautifier){var A=r.firstChild,O=T.tagName
+if(-1!="|TBODY|THEAD|TFOOT|".indexOf("|"+O+"|")||8==T.nodeType)r.appendChild(T)
+else if("COLGROUP"==O||"CAPTION"==O)r.insertBefore(T,A)
+else if(A&&-1!="|TBODY|THEAD|TFOOT|".indexOf("|"+A.tagName+"|")||(A=r.appendChild(t.createElement("tbody"))),"TR"==O)A.appendChild(T)
 else{var N=A.firstChild
-if(N&&"TR"==N.tagname||(N=A.appendChild(t.createElement("tr"))),"td"==O||"th"==O)N.appendChild(x)
+if(N&&"TR"==N.tagname||(N=A.appendChild(t.createElement("tr"))),"TD"==O||"TH"==O)N.appendChild(T)
 else{var E=N.firstChild
-E&&"TD"==E.tagName&&"TH"==E.tagName||(E=N.appendChild(t.createElement("td"))),E.appendChild(x)}}}else r.appendChild(x)
+E&&"TD"==E.tagName&&"TH"==E.tagName||(E=N.appendChild(t.createElement("td"))),E.appendChild(T)}}}else r.appendChild(T)
 if(n.documentFragment||n.fragment){var L=t.createDocumentFragment()
 return L.appendChild(r),L}return r},setAttribute=function(e,t,a){if(t=f(t.toLowerCase()),/^data-/.test(t))e.dataset?e.dataset[u(t.substring(5))]=a:e.setAttribute(t,a)
 else if(/^on/.test(t)){e.setAttribute(t,a)
@@ -44,8 +44,8 @@ if("input"==(""+h).toLowerCase()){var g,y=c&&c.attr?c.attr.name||c.attr.NAME:!1
 if(!y){for(n.lastIndex=0;o=n.exec(e);)y=o[1]
 y&&(y=f(y),g=y.charAt(0),"'"!=g&&'"'!=g||y.charAt(y.length-1)!=g||(y=y.substring(1,y.length-1)))}if(y){try{p=t.createElement('<input name = "'+y+'" >'),m=!0}catch(v){p=t.createElement("input"),p.name=y}"INPUT"!=p.tagName&&(p=t.createElement("input"),p.name=y)}}for(;o=r.exec(e);)if(o[1]){var C=o[1].substring(1)
 p.classList?p.classList.add(C):p.className?p.className+=" "+C:p.className=C}else if(o[2])p.id=o[2].substring(1)
-else if(o[3]){var x=i.exec(o[3])
-x&&x[1]&&(x=x[1],setAttribute(p,x,x))}else if(o[4]){s.lastIndex=0
-var T=s.exec(o[4]),x=T[1],b=T[2],A=b.charAt(0),O=b.charAt(b.length-1)
-"'"!=A&&'"'!=A||A!==O||(b=b.substring(1,b.length-1)),m||"name"==x.toLowerCase()&&"INPUT"==p.tagName||setAttribute(p,x,b)}}else var p=t.createTextNode(e.substring(1,e.length-1))
+else if(o[3]){var T=i.exec(o[3])
+T&&T[1]&&(T=T[1],setAttribute(p,T,T))}else if(o[4]){s.lastIndex=0
+var x=s.exec(o[4]),T=x[1],b=x[2],A=b.charAt(0),O=b.charAt(b.length-1)
+"'"!=A&&'"'!=A||A!==O||(b=b.substring(1,b.length-1)),m||"name"==T.toLowerCase()&&"INPUT"==p.tagName||setAttribute(p,T,b)}}else var p=t.createTextNode(e.substring(1,e.length-1))
 return c&&""+c===c&&(c={content:c}),c&&xCreateElement&&(p=xCreateElement(e,p,c,m)),p},e.DOMBuilder=DOMBuilder}(window)

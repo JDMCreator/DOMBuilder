@@ -16,6 +16,17 @@ Legend :
 - Removed
 # Fixed
 
+
+=================================
+========== Version 1.2.1 ==========
+=================================
+
+
+Release date : June 2st, 2013
+
+# Fixed : It was impossible to add <TR>, <TD> and <TH> elements in a <TABLE> element with the tableBeautifier on
+
+
 =================================
 ========== Version 1.2 ==========
 =================================
@@ -25,7 +36,7 @@ Release date : May 18th, 2013
 
 # Fixed : "noShade", "hSpace" and "vSpace" attributes are now supported in IE 6-7
 # Fixed : Setting inline events didn't work in IE
-# Fixed : It was impossible to add comments, <TBODY>, <THEAD>, <TFOOT>, <COLGROUP> and <CAPTION> in a <TABLE> elements with the tableBeautifier on
+# Fixed : It was impossible to add comments, <TBODY>, <THEAD>, <TFOOT>, <COLGROUP> and <CAPTION> in a <TABLE> element with the tableBeautifier on
 # Fixed : "value" didn't worked for <OPTION> tags
 
 
