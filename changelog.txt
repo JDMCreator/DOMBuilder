@@ -18,11 +18,23 @@ Legend :
 
 
 =================================
+========== Version 1.3 ==========
+=================================
+
+
+Release date : August 28th, 2013
+
++ added "title" property for all tags
++ added "href" and "src" properties for all tags that support them. The value will always be converted to a long URL (ex : "index.html" to "http://www.example.com/index.html")
++ added new "^" parameter for the attribute selector. It is a shortcut for data attributes. So, div[^foo=bar] is the same as div[data-foo=bar]
+# Fixed : Improved speed for the name property
+
+=================================
 ========== Version 1.2.1 ==========
 =================================
 
 
-Release date : June 2st, 2013
+Release date : June 2nd, 2013
 
 # Fixed : It was impossible to add <TR>, <TD> and <TH> elements in a <TABLE> element with the tableBeautifier on
 

@@ -1,13 +1,13 @@
 DOMBuilder
 =============
 
-__Version 1.2.1__
+__Version 1.3__
 
 How to use :
 -------------
 
 ```js
-var element = DOMBuilder("input#id.myClass[type=checkbox][checked]");
+var element = DOMBuilder("input#id.myClass[type=checkbox][checked][^foo=bar]");
 ```
 
 is the same as :
@@ -18,6 +18,7 @@ element.id = "id";
 element.className = "myClass";
 element.type = "checkbox";
 element.checked = "checked";
+element.setAttribute("data-foo", "bar");
 ```
 
 
@@ -76,7 +77,7 @@ DOMBuilder("label", {
 
 *If you don't want to quote the attributes' name, you must use __className__ for the CLASS attribute and __htmlFor__ for the FOR attribute*
 
-**childNodes** : An ```Array``` of the child nodes of the element. The elements of the array can be an ```HTMLElement Object```, an ```Array``` or a ```String```. If it's a String, the ```DOMBuilder``` function will be called and the String will be the first argument. If it's an Array, it will be the arguments of the ```DOMBuilder``` function.Example :
+**childNodes** : An ```Array``` of the child nodes of the element. The elements of the array can be an ```HTMLElement Object```, an ```Array``` or a ```String```. If it's a String, the ```DOMBuilder``` function will be called and the String will be the first argument. If it's an Array, it will be the arguments of the ```DOMBuilder``` function. Example :
 
 ```js
 DOMBuilder("div#myDiv", {
@@ -111,6 +112,8 @@ The HTML code of the element that is generated should look like this :
 
 **fragment** : ```Boolean```. See **documentFragment**
 
+**href** : ```String```. The value of the element's ```href``` attribute. It will be converted to a long URL (ex : "index.html" will become "http://www.example.com/index.html")
+
 **html** : ```String```. The innerHTML of the element. Works for all element excepts singleton tags (BR, HR, META, ...), SCRIPT (use **script** or **content**), STYLE (use **css** or **content**), INPUT and TEXTAREA (use **value**).
 
 **jQuery** : ```Function``` or ```Boolean```. The jQuery function. If specified, we'll use the ".on()" jQuery function to append the events. Example :
@@ -135,6 +138,7 @@ DOMBuilder("div", {
         }
 });
 ```
+**src** : ```String```. The value of the element's ```src``` attribute. It will be converted to a long URL (ex : "index.html" will become "http://www.example.com/index.html")
 
 **style** : ```String```. STYLE attribute of the element. Example :
 
@@ -160,5 +164,7 @@ DOMBuilder("div", {
     text : "<text>"
 })
 ```
+
+**title** : ```String```. The value of the element's ```title``` property.
 
 **value** : ```String```. The value of the ``defaultValue`` property of INPUT and TEXTAREA elements and the value of the OPTION elements.
