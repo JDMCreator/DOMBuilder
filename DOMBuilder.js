@@ -8,14 +8,6 @@
         regexp_attributes = /\[[ ]*(\^?)[ ]*([a-z_-]+)[ ]*=[ ]*([^\]]+)/gi,
         regexp_comment = /^<!--([\S\s]*)-->$/gi,
 
-        /* Attributes that need to be escaped for IE6-7 */
-        wrong_attributes = ["httpEquiv", "allowTransparency", "aLink", "bgColor", "vLink", "acceptCharset", "tabIndex", "accessKey", "readOnly",
-            "useMap", "dateTime", "isMap", "codeBase", "codeType", "noHref", "cellPadding", "cellSpacing",
-            "chOff", "vAlign", "colSpan", "noWrap", "rowSpan", "frameBorder", "longDesc", "marginHeight",
-            "marginWidth", "noResize", "noShade", "hSpace", "vSpace"
-        ],
-        wrong_attributes_list = "|" + wrong_attributes.join("|").toLowerCase() + "|",
-
         trimPrototype = String.prototype.trim,
         trim = function trim(str) {
             if (trimPrototype) {
@@ -29,12 +21,21 @@
         },
         camelize = function camelize(str) {
             return str.replace(/(\-[a-z])/g, function ($1) {
-                return $1.toUpperCase().replace('-', '');
+                return $1.toUpperCase().replace("-", "");
             });
         },
         isArray = function isArray(a) {
             return Object.prototype.toString.call(a) === "[object Array]";
-        }
+        },
+	canFixIE = (function(){
+		try{
+			document.createElement("<input name='test'>");
+			return true;
+		}
+		catch(e){
+			return false
+		}
+	})();
     isASingleton = function isASingleton(tag) {
         return "|base|br|col|command|embed|hr|img|input|link|meta|param|source".indexOf("|" + tag + "|") != -1;
     },
@@ -114,6 +115,7 @@
         }
         if (options.value) {
             if (tagname == "input" || tagname == "textarea") {
+		element.value = options.value;
                 element.defaultValue = options.value;
             }
             else if (tagname == "option") {
@@ -127,10 +129,10 @@
             var _element = document.createElement("a");
             _element.href = options.src || options.href;
             if (options.src) {
-                _element.src = _element.href;
+                element.src = _element.href;
             }
             else {
-                _element.href = _element.href;
+                element.href = _element.href;
             }
         }
         if (options.on) {
@@ -270,19 +272,32 @@
                 element.setAttribute(name, value, 0);
             }
         }
-        else if (wrong_attributes_list.indexOf("|" + name + "|") != -1) {
-            for (var i = 0, n, ni; i < wrong_attributes.length; i++) {
-                var n = wrong_attributes[i],
-                    ni = n.toLowerCase();
-                if (ni == name) {
-                    element[n] = value;
+        else {
+            element.setAttribute(name, value, 0);
+        }
+    },
+    getName = function(selector, options) {
+        var name = "", match, name_first_char;
+        if (options && options.attr) {
+            var attr = options.attr;
+            for (var prop in attr) {
+                if (prop.toLowerCase() == "name" && attr.hasOwnProperty(prop)) {
+                    return attr[prop];
                 }
             }
         }
-        else {
-
-            element.setAttribute(name, value, 0);
+        regexp_argument_name.lastIndex = 0;
+        while (match = regexp_argument_name.exec(selector)) {
+            name = match[1];
         }
+        if (name) {
+            name = trim(name);
+            name_first_char = name.charAt(0);
+            if ((name_first_char == "'" || name_first_char == '"') && name.charAt(name.length - 1) == name_first_char) {
+                name = name.substring(1, name.length - 1);
+            }
+        }
+	return name;
     },
     DOMBuilder = function createElement(selector, options) {
         selector = trim(selector || "");
@@ -305,29 +320,14 @@
         }
         else {
             /* Process HTML Elements */
-            var tagname = regexp_tagname.exec(selector) || "div",
+            var tagname = regexp_tagname.exec(selector) || ["div"],
                 element = document.createElement(tagname[0]),
                 fixIEBug = false;
-            if (tagname.toString().toLowerCase() == "input") {
-                var name = (options && options.attr) ? options.attr["name"] || options.attr["NAME"] : false,
-                    name_first_char;
-                if (!name) {
-                    regexp_argument_name.lastIndex = 0;
-                    while (match = regexp_argument_name.exec(selector)) {
-                        name = match[1];
-                    };
-                    if (name) {
-                        name = trim(name);
-                        name_first_char = name.charAt(0);
-                        if ((name_first_char == "'" || name_first_char == '"') && name.charAt(name.length - 1) == name_first_char) {
-                            name = name.substring(1, name.length - 1);
-                        }
-                    }
-                }
+            if (tagname.toString().toLowerCase() == "input" && canFixIE) {
+                var name = getName(selector, options);
                 if (name) {
-                    // Terrible try{} catch{} for IE6-7 bug where "name" attribute for input don't work
+                    // Terrible try{} catch{} for IE6-7 bug where "name" attribute for input doesn't work
                     // more info here : http://webbugtrack.blogspot.ca/2007/10/bug-235-createelement-is-broken-in-ie.html
-                    // I'll try to find another way to patch this issue;
                     try {
                         element = document.createElement('<input name = "' + name + '" >');
                         fixIEBug = true;
@@ -375,7 +375,7 @@
                     if ((attribute_value_first_char == "'" || attribute_value_first_char == '"') && attribute_value_first_char === attribute_value_last_char) {
                         attribute_value = attribute_value.substring(1, attribute_value.length - 1)
                     }
-                    if (!fixIEBug && (attribute_name.toLowerCase() != "name" || element.tagName != "INPUT")) {
+                    if (!fixIEBug || (attribute_name.toLowerCase() != "name" && element.tagName != "INPUT")) {
                         setAttribute(element, attribute_name, attribute_value);
                     }
                 }

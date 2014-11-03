@@ -1,7 +1,7 @@
 DOMBuilder
 =============
 
-__Version 1.3__
+__Version 1.4__
 
 How to use :
 -------------
