@@ -3,7 +3,7 @@
 |=================================|
 |======= (c) JDMCreator ==========|
 |=================================|
-|============= 2013 ==============|
+|============= 2017 ==============|
 |=================================|
 
 
@@ -16,6 +16,27 @@ Legend :
 - Removed
 # Fixed
 
+=================================
+========== Version 1.5 ==========
+=================================
+
+
+Release date : May 4th, 2017
+
+/ Changed : "trim" algorithm changed
+# Fixed : SOURCE elements were not detected as singleton
+
+=================================
+========== Version 1.4 ==========
+=================================
+
+
+Release date : November 11th, 2014
+
+# Fixed : Improved speed of creation of INPUT elements
+# Fixed : "src" and "href" bugs
+# Fixed : General speed improvements
+# Fixed : Minor bugs
 
 =================================
 ========== Version 1.3 ==========

@@ -1,4 +1,4 @@
-/* (c) 2013, JDMCreator | DOMBuilder.js | Version 1.3 */
+/* (c) 2017, JDMCreator | DOMBuilder.js | Version 1.5 */
 (function (window, undefined) {
     var document = window.document,
         regexp_tagname = /^[a-z]+/i,
@@ -11,13 +11,9 @@
         trimPrototype = String.prototype.trim,
         trim = function trim(str) {
             if (trimPrototype) {
-                trimPrototype.call(str);
+                return trimPrototype.call(str);
             }
-            var str = str.replace(/^\s\s*/, ''),
-                ws = /\s/,
-                i = str.length;
-            while (ws.test(str.charAt(--i)));
-            return str.slice(0, i + 1);
+            return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '')
         },
         camelize = function camelize(str) {
             return str.replace(/(\-[a-z])/g, function ($1) {
@@ -37,7 +33,7 @@
 		}
 	})();
     isASingleton = function isASingleton(tag) {
-        return "|base|br|col|command|embed|hr|img|input|link|meta|param|source".indexOf("|" + tag + "|") != -1;
+        return "|base|br|col|command|embed|hr|img|input|link|meta|param|source|".indexOf("|" + tag + "|") != -1;
     },
     xCreateElement = function xCreateElement(selector, element, options, fixIEBug) {
         if (element.nodeType != 1) {
